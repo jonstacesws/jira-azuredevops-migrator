@@ -592,7 +592,8 @@ namespace WorkItemImport
                     changedDate = RevisionUtility.NextValidDeltaRev(rev.Time);
 
                 wi.Fields[WiFieldReference.ChangedDate] = changedDate;
-                wi.Fields[WiFieldReference.ChangedBy] = rev.Author;
+                if (rev.Author != null)
+                    wi.Fields[WiFieldReference.ChangedBy] = rev.Author;
             }
         }
 
