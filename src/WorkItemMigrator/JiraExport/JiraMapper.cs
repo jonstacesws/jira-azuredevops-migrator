@@ -275,7 +275,14 @@ namespace JiraExport
 
                             if (include)
                             {
-                                value = TruncateField(value.ToString(), fieldreference);
+                                //Properly format datetimes to use the ISO 8601 format suitable for JSON
+                                string valueAsString;
+                                if (value is DateTime)
+                                    valueAsString = ((DateTime)value).ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+                                else
+                                    valueAsString = value.ToString();
+
+                                value = TruncateField(valueAsString, fieldreference);
 
                                 Logger.Log(LogLevel.Debug, $"Mapped value '{value}' to field '{fieldreference}'.");
                                 fields.Add(new WiField()
