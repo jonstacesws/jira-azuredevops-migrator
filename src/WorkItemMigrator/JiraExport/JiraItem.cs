@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -410,10 +411,17 @@ namespace JiraExport
                 var type = prop.Value.Type;
                 var name = prop.Name.ToLower();
                 object value = null;
+                DateTime potentialDate;
 
                 if (_fieldExtractionMapping.TryGetValue(name, out Func<JToken, object> mapping))
                 {
                     value = mapping(prop.Value);
+                }
+                else if (type == JTokenType.String && DateTime.TryParseExact(prop.Value.Value<string>(), "yyyy-MM-dd", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out potentialDate))
+                {
+                    //if it comes from Jira as a string and matches this specific date format, then it's probably a Date Picker field (no time element).
+                    //use the date value
+                    value = potentialDate;
                 }
                 else if (type == JTokenType.String || type == JTokenType.Integer || type == JTokenType.Float)
                 {
